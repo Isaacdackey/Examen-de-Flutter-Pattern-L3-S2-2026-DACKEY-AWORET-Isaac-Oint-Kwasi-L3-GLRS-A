@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:examflutter/core/services/api_service.dart';
 import 'package:examflutter/core/services/auth_service.dart';
 import 'package:examflutter/features/transfers/transfer_screen.dart';
+import 'package:examflutter/features/bills/bills_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -206,7 +207,14 @@ class DashboardScreen extends StatelessWidget {
                   icon: Icons.receipt,
                   label: 'Factures',
                   color: const Color(0xFF28A745),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const BillsScreen(),
+                      ),
+                    );
+                  },
                 ),
                 _buildQuickAction(
                   icon: Icons.history,
