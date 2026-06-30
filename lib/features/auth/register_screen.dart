@@ -7,26 +7,41 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   bool _isLoading = false;
+  String _selectedRole = 'CLIENT';
 
-  Future<void> _login() async {
+  Future<void> _register() async {
     final phone = _phoneController.text.trim();
+    final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
 
-    if (phone.isEmpty || password.isEmpty) {
+    if (phone.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       Fluttertoast.showToast(
         msg: 'Veuillez remplir tous les champs',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      Fluttertoast.showToast(
+        msg: 'Les mots de passe ne correspondent pas',
         backgroundColor: Colors.red,
         textColor: Colors.white,
       );
@@ -38,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final apiService = Provider.of<ApiService>(context, listen: false);
     final authService = Provider.of<AuthService>(context, listen: false);
 
-    final result = await apiService.login(phone, password);
+    final result = await apiService.register(phone, email, password, _selectedRole);
 
     setState(() => _isLoading = false);
 
@@ -52,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } else {
       Fluttertoast.showToast(
-        msg: result['message'] ?? 'Erreur de connexion',
+        msg: result['message'] ?? 'Erreur lors de l\'inscription',
         backgroundColor: Colors.red,
         textColor: Colors.white,
       );
@@ -62,6 +77,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Inscription',
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -86,26 +109,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Icon(
                         Icons.account_balance_wallet,
-                        size: 64,
+                        size: 48,
                         color: Color(0xFF667EEA),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'BadWallet',
+                        'Créer un compte',
                         style: GoogleFonts.inter(
-                          fontSize: 28,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF333333),
                         ),
                       ),
-                      Text(
-                        'Connectez-vous à votre compte',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 24),
+                      
+                      // Téléphone
                       TextField(
                         controller: _phoneController,
                         decoration: InputDecoration(
@@ -119,12 +137,29 @@ class _LoginScreenState extends State<LoginScreen> {
                         keyboardType: TextInputType.phone,
                       ),
                       const SizedBox(height: 16),
+                      
+                      // Email
+                      TextField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          hintText: 'votre@email.com',
+                          prefixIcon: const Icon(Icons.email),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Mot de passe
                       TextField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           labelText: 'Mot de passe',
-                          hintText: 'password123',
+                          hintText: 'Minimum 6 caractères',
                           prefixIcon: const Icon(Icons.lock),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -143,11 +178,68 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      
+                      
+                      TextField(
+                        controller: _confirmPasswordController,
+                        obscureText: _obscureConfirmPassword,
+                        decoration: InputDecoration(
+                          labelText: 'Confirmer le mot de passe',
+                          hintText: 'Confirmez votre mot de passe',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureConfirmPassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureConfirmPassword = !_obscureConfirmPassword;
+                              });
+                            },
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      
+                      DropdownButtonFormField<String>(
+                        initialValue: _selectedRole,  
+                        decoration: InputDecoration(
+                          labelText: 'Type de compte',
+                          prefixIcon: const Icon(Icons.person),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'CLIENT',
+                            child: Text('Client'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'AGENT',
+                            child: Text('Agent'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedRole = value ?? 'CLIENT';
+                          });
+                        },
+                      ),
                       const SizedBox(height: 24),
+                      
+                      
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _isLoading ? null : _login,
+                          onPressed: _isLoading ? null : _register,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF667EEA),
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -161,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   size: 24,
                                 )
                               : Text(
-                                  'Se connecter',
+                                  'S\'inscrire',
                                   style: GoogleFonts.inter(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -171,17 +263,29 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () {
-                          _phoneController.text = '+221770000001';
-                          _passwordController.text = 'password123';
-                        },
-                        child: Text(
-                          'Utiliser le compte de démonstration',
-                          style: GoogleFonts.inter(
-                            color: const Color(0xFF667EEA),
+                      
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Déjà un compte ?',
+                            style: GoogleFonts.inter(
+                              color: Colors.grey[600],
+                            ),
                           ),
-                        ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              'Se connecter',
+                              style: GoogleFonts.inter(
+                                color: const Color(0xFF667EEA),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

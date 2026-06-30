@@ -59,16 +59,16 @@ class ApiService extends ChangeNotifier {
     };
   }
 
-  Future<Map<String, dynamic>> login(String phoneNumber, String password) async {
+  Future<Map<String, dynamic>> login(
+    String phoneNumber,
+    String password,
+  ) async {
     setLoading(true);
     try {
       final response = await http.post(
         Uri.parse('${ApiConstants.baseUrl}${ApiConstants.login}'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'phoneNumber': phoneNumber,
-          'password': password,
-        }),
+        body: json.encode({'phoneNumber': phoneNumber, 'password': password}),
       );
 
       if (response.statusCode == 200) {
@@ -91,10 +91,51 @@ class ApiService extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> register(
+    String phoneNumber,
+    String email,
+    String password,
+    String role,
+  ) async {
+    setLoading(true);
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConstants.baseUrl}${ApiConstants.register}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'phoneNumber': phoneNumber,
+          'email': email,
+          'password': password,
+          'role': role,
+        }),
+      );
+
+      setLoading(false);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          final token = data['data']['token'];
+          setToken(token);
+          setPhoneNumber(phoneNumber);
+          await getBalance(phoneNumber);
+          await getTransactions(phoneNumber);
+          return {'success': true, 'data': data['data']};
+        }
+        return {'success': false, 'message': data['message'] ?? 'Erreur'};
+      }
+      return {'success': false, 'message': 'Erreur lors de l\'inscription'};
+    } catch (e) {
+      setLoading(false);
+      return {'success': false, 'message': 'Erreur de connexion'};
+    }
+  }
+
   Future<void> getBalance(String phone) async {
     try {
       final response = await http.get(
-        Uri.parse('${ApiConstants.baseUrl}${ApiConstants.balance.replaceAll('{phone}', phone)}'),
+        Uri.parse(
+          '${ApiConstants.baseUrl}${ApiConstants.balance.replaceAll('{phone}', phone)}',
+        ),
         headers: _getHeaders(),
       );
 
@@ -112,7 +153,9 @@ class ApiService extends ChangeNotifier {
   Future<void> getTransactions(String phone) async {
     try {
       final response = await http.get(
-        Uri.parse('${ApiConstants.baseUrl}${ApiConstants.transactions.replaceAll('{phone}', phone)}'),
+        Uri.parse(
+          '${ApiConstants.baseUrl}${ApiConstants.transactions.replaceAll('{phone}', phone)}',
+        ),
         headers: _getHeaders(),
       );
 
@@ -128,7 +171,11 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> transfer(String senderPhone, String receiverPhone, double amount) async {
+  Future<Map<String, dynamic>> transfer(
+    String senderPhone,
+    String receiverPhone,
+    double amount,
+  ) async {
     setLoading(true);
     try {
       final response = await http.post(
@@ -161,7 +208,9 @@ class ApiService extends ChangeNotifier {
   Future<Map<String, dynamic>> getBills(String walletCode) async {
     try {
       final response = await http.get(
-        Uri.parse('${ApiConstants.baseUrl}${ApiConstants.bills.replaceAll('{code}', walletCode)}'),
+        Uri.parse(
+          '${ApiConstants.baseUrl}${ApiConstants.bills.replaceAll('{code}', walletCode)}',
+        ),
         headers: _getHeaders(),
       );
 
@@ -179,7 +228,11 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> payBills(String phoneNumber, String serviceName, List<String> references) async {
+  Future<Map<String, dynamic>> payBills(
+    String phoneNumber,
+    String serviceName,
+    List<String> references,
+  ) async {
     setLoading(true);
     try {
       final response = await http.post(
