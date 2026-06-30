@@ -59,6 +59,25 @@ class ApiService extends ChangeNotifier {
     };
   }
 
+  Future<Map<String, dynamic>> getWalletByPhone(String phone) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}${ApiConstants.wallets}/$phone'),
+        headers: _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          return {'success': true, 'data': data['data']};
+        }
+      }
+      return {'success': false, 'message': 'Erreur'};
+    } catch (e) {
+      return {'success': false, 'message': 'Erreur de connexion'};
+    }
+  }
+
   Future<Map<String, dynamic>> login(
     String phoneNumber,
     String password,
