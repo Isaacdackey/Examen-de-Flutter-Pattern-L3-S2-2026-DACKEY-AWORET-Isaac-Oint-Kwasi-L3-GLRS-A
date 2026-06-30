@@ -5,7 +5,6 @@ import 'package:examflutter/core/services/auth_service.dart';
 import 'package:examflutter/features/dashboard/dashboard_screen.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -78,9 +77,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Inscription',
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -113,17 +112,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         color: Color(0xFF667EEA),
                       ),
                       const SizedBox(height: 8),
-                      Text(
+                      const Text(
                         'Créer un compte',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF333333),
+                          color: Color(0xFF333333),
                         ),
                       ),
                       const SizedBox(height: 24),
                       
-                      // Téléphone
+                     
                       TextField(
                         controller: _phoneController,
                         decoration: InputDecoration(
@@ -138,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
                       
-                      // Email
+                    
                       TextField(
                         controller: _emailController,
                         decoration: InputDecoration(
@@ -153,7 +152,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
                       
-                      // Mot de passe
+                      
                       TextField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
@@ -209,7 +208,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       
                       
                       DropdownButtonFormField<String>(
-                        initialValue: _selectedRole,  
+                        initialValue: _selectedRole,
                         decoration: InputDecoration(
                           labelText: 'Type de compte',
                           prefixIcon: const Icon(Icons.person),
@@ -235,7 +234,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 24),
                       
-                      
+                    
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -252,9 +251,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   color: Colors.white,
                                   size: 24,
                                 )
-                              : Text(
+                              : const Text(
                                   'S\'inscrire',
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
@@ -264,12 +263,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
                       
+                      
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             'Déjà un compte ?',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               color: Colors.grey[600],
                             ),
                           ),
@@ -277,10 +277,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: Text(
+                            child: const Text(
                               'Se connecter',
-                              style: GoogleFonts.inter(
-                                color: const Color(0xFF667EEA),
+                              style: TextStyle(
+                                color: Color(0xFF667EEA),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

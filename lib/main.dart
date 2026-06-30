@@ -4,7 +4,6 @@ import 'package:examflutter/core/services/api_service.dart';
 import 'package:examflutter/core/services/auth_service.dart';
 import 'package:examflutter/features/auth/login_screen.dart';
 import 'package:examflutter/features/dashboard/dashboard_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,7 +27,6 @@ class MyApp extends StatelessWidget {
             seedColor: const Color(0xFF667EEA),
             brightness: Brightness.light,
           ),
-          textTheme: GoogleFonts.interTextTheme(),
           appBarTheme: const AppBarTheme(
             backgroundColor: Colors.white,
             foregroundColor: Colors.black,

@@ -5,7 +5,6 @@ import 'package:examflutter/core/services/auth_service.dart';
 import 'package:examflutter/features/dashboard/dashboard_screen.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -90,20 +89,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: Color(0xFF667EEA),
                       ),
                       const SizedBox(height: 8),
-                      Text(
+                      const Text(
                         'BadWallet',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF333333),
+                          color: Color(0xFF333333),
                         ),
                       ),
                       Text(
                         'Connectez-vous à votre compte',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                       const SizedBox(height: 32),
                       TextField(
@@ -116,7 +112,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        keyboardType: TextInputType.phone,
+                        keyboardType: TextInputType.text,
+
+                        enableInteractiveSelection: true,
                       ),
                       const SizedBox(height: 16),
                       TextField(
@@ -160,9 +158,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   color: Colors.white,
                                   size: 24,
                                 )
-                              : Text(
+                              : const Text(
                                   'Se connecter',
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
@@ -176,11 +174,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           _phoneController.text = '+221770000001';
                           _passwordController.text = 'password123';
                         },
-                        child: Text(
+                        child: const Text(
                           'Utiliser le compte de démonstration',
-                          style: GoogleFonts.inter(
-                            color: const Color(0xFF667EEA),
-                          ),
+                          style: TextStyle(color: Color(0xFF667EEA)),
                         ),
                       ),
                     ],
