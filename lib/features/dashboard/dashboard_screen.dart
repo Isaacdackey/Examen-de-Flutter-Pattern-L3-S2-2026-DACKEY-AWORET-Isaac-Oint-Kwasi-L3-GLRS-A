@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:examflutter/core/services/api_service.dart';
 import 'package:examflutter/core/services/auth_service.dart';
+import 'package:examflutter/features/transfers/transfer_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -51,7 +52,7 @@ class DashboardScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.purple.withOpacity(0.3),
+                    color: Colors.purple.withValues(alpha: 0.3),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -83,21 +84,21 @@ class DashboardScreen extends StatelessWidget {
                         context,
                         icon: Icons.send,
                         label: 'Transfert',
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                       ),
                       const SizedBox(width: 12),
                       _buildActionButton(
                         context,
                         icon: Icons.receipt,
                         label: 'Factures',
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                       ),
                       const SizedBox(width: 12),
                       _buildActionButton(
                         context,
                         icon: Icons.history,
                         label: 'Historique',
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                       ),
                     ],
                   ),
@@ -105,8 +106,6 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-
-          
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -114,7 +113,7 @@ class DashboardScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withValues(alpha: 0.1),
                     blurRadius: 5,
                     offset: const Offset(0, 2),
                   ),
@@ -175,8 +174,6 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-
-            
             const Text(
               'Actions rapides',
               style: TextStyle(
@@ -197,30 +194,29 @@ class DashboardScreen extends StatelessWidget {
                   label: 'Transfert',
                   color: const Color(0xFF667EEA),
                   onTap: () {
-                    
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const TransferScreen(),
+                      ),
+                    );
                   },
                 ),
                 _buildQuickAction(
                   icon: Icons.receipt,
                   label: 'Factures',
                   color: const Color(0xFF28A745),
-                  onTap: () {
-                    
-                  },
+                  onTap: () {},
                 ),
                 _buildQuickAction(
                   icon: Icons.history,
                   label: 'Historique',
                   color: const Color(0xFFFF6B35),
-                  onTap: () {
-                    
-                  },
+                  onTap: () {},
                 ),
               ],
             ),
             const SizedBox(height: 24),
-
-            
             const Text(
               'Dernières transactions',
               style: TextStyle(
@@ -236,7 +232,7 @@ class DashboardScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withValues(alpha: 0.1),
                     blurRadius: 5,
                     offset: const Offset(0, 2),
                   ),
@@ -308,7 +304,7 @@ class DashboardScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -320,7 +316,7 @@ class DashboardScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
