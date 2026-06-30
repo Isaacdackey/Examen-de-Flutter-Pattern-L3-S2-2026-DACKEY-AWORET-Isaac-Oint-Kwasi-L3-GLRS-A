@@ -25,18 +25,22 @@ class _BillsScreenState extends State<BillsScreen> {
   }
 
   Future<void> _loadBills() async {
-    setState(() => _isLoading = true);
-    final apiService = Provider.of<ApiService>(context, listen: false);
-    final authService = Provider.of<AuthService>(context, listen: false);
-    final phone = authService.phoneNumber;
+  setState(() => _isLoading = true);
+  final apiService = Provider.of<ApiService>(context, listen: false);
+  final authService = Provider.of<AuthService>(context, listen: false);
+  final phone = authService.phoneNumber;
 
-    if (phone != null) {
-      final walletCode = 'WLT-0000001';
+  if (phone != null) {
+    final response = await apiService.getWalletByPhone(phone);
+    if (response['success'] == true) {
+      final wallet = response['data'];
+      final walletCode = wallet['code'];
       await apiService.getBills(walletCode);
       _factures = apiService.factures.where((f) => !f.payee).toList();
     }
-    setState(() => _isLoading = false);
   }
+  setState(() => _isLoading = false);
+}
 
   Future<void> _payBills() async {
     if (_selectedIds.isEmpty) {

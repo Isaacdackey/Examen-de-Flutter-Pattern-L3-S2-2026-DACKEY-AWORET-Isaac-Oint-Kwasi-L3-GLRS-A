@@ -59,6 +59,25 @@ class ApiService extends ChangeNotifier {
     };
   }
 
+  Future<Map<String, dynamic>> getWalletByPhone(String phone) async {
+  try {
+    final response = await http.get(
+      Uri.parse('${ApiConstants.baseUrl}${ApiConstants.wallets}/$phone'),
+      headers: _getHeaders(),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+    }
+    return {'success': false, 'message': 'Erreur'};
+  } catch (e) {
+    return {'success': false, 'message': 'Erreur de connexion'};
+  }
+}
+
   Future<Map<String, dynamic>> login(
     String phoneNumber,
     String password,
@@ -131,24 +150,25 @@ class ApiService extends ChangeNotifier {
   }
 
   Future<void> getBalance(String phone) async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-          '${ApiConstants.baseUrl}${ApiConstants.balance.replaceAll('{phone}', phone)}',
-        ),
-        headers: _getHeaders(),
-      );
+  try {
+    final response = await http.get(
+      Uri.parse(
+        '${ApiConstants.baseUrl}${ApiConstants.balance.replaceAll('{phone}', phone)}',
+      ),
+      headers: _getHeaders(),
+    );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          updateBalance((data['data'] ?? 0).toDouble());
-        }
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      print('getBalance response: $data');
+      if (data['success'] == true) {
+        updateBalance((data['data'] ?? 0).toDouble());
       }
-    } catch (e) {
-      debugPrint('Error getting balance: $e');
     }
+  } catch (e) {
+    debugPrint('Error getting balance: $e');
   }
+}
 
   Future<void> getTransactions(String phone) async {
     try {

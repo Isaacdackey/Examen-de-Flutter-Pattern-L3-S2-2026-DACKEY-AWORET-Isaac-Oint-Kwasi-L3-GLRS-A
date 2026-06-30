@@ -16,6 +16,44 @@ class _TransferScreenState extends State<TransferScreen> {
   final TextEditingController _receiverController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   bool _isLoading = false;
+  bool _isReceiverFocused = true;
+
+  void _appendNumber(String number) {
+    if (_isReceiverFocused) {
+      _receiverController.text += number;
+    } else {
+      _amountController.text += number;
+    }
+    setState(() {});
+  }
+
+  void _deleteLast() {
+    if (_isReceiverFocused) {
+      if (_receiverController.text.isNotEmpty) {
+        _receiverController.text = _receiverController.text.substring(
+          0,
+          _receiverController.text.length - 1,
+        );
+      }
+    } else {
+      if (_amountController.text.isNotEmpty) {
+        _amountController.text = _amountController.text.substring(
+          0,
+          _amountController.text.length - 1,
+        );
+      }
+    }
+    setState(() {});
+  }
+
+  void _clearField() {
+    if (_isReceiverFocused) {
+      _receiverController.clear();
+    } else {
+      _amountController.clear();
+    }
+    setState(() {});
+  }
 
   Future<void> _transfer() async {
     final receiver = _receiverController.text.trim();
@@ -83,6 +121,11 @@ class _TransferScreenState extends State<TransferScreen> {
         backgroundColor: Colors.green,
         textColor: Colors.white,
       );
+      
+      
+      await apiService.getBalance(sender);
+      await apiService.getTransactions(sender);
+      
       _receiverController.clear();
       _amountController.clear();
       if (mounted) {
@@ -109,119 +152,259 @@ class _TransferScreenState extends State<TransferScreen> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: [
+          TextButton(
+            onPressed: _clearField,
+            child: const Text(
+              'Effacer',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF667EEA).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
                 children: [
-                  const Text(
-                    'Solde disponible',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF667EEA).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Solde disponible',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          Formatters.formatCurrency(apiService.balance),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF667EEA),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Text(
-                    Formatters.formatCurrency(apiService.balance),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF667EEA),
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isReceiverFocused = true;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _isReceiverFocused
+                            ? const Color(0xFF667EEA).withValues(alpha: 0.1)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _isReceiverFocused
+                              ? const Color(0xFF667EEA)
+                              : Colors.grey.shade300,
+                          width: 2,
+                        ),
+                      ),
+                      child: TextField(
+                        controller: _receiverController,
+                        enabled: false,
+                        style: const TextStyle(fontSize: 18),
+                        decoration: const InputDecoration(
+                          labelText: 'Numéro du destinataire',
+                          hintText: '+221 77 000 00 02',
+                          border: InputBorder.none,
+                          prefixIcon: Icon(Icons.person),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isReceiverFocused = false;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: !_isReceiverFocused
+                            ? const Color(0xFF667EEA).withValues(alpha: 0.1)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: !_isReceiverFocused
+                              ? const Color(0xFF667EEA)
+                              : Colors.grey.shade300,
+                          width: 2,
+                        ),
+                      ),
+                      child: TextField(
+                        controller: _amountController,
+                        enabled: false,
+                        style: const TextStyle(fontSize: 18),
+                        decoration: const InputDecoration(
+                          labelText: 'Montant',
+                          hintText: '0',
+                          border: InputBorder.none,
+                          prefixIcon: Icon(Icons.money),
+                          suffixText: 'FCFA',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Frais de transfert : 0 FCFA',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 56,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _transfer,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF667EEA),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Transférer',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
+          ),
+          Container(
+            padding: const EdgeInsets.all(8),
+            color: Colors.grey.shade100,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    TextField(
-                      controller: _receiverController,
-                      decoration: InputDecoration(
-                        labelText: 'Numéro du destinataire',
-                        hintText: '+221 77 000 00 02',
-                        prefixIcon: const Icon(Icons.person),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      keyboardType: TextInputType.phone,
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _amountController,
-                      decoration: InputDecoration(
-                        labelText: 'Montant',
-                        hintText: '0',
-                        prefixIcon: const Icon(Icons.money),
-                        suffixText: 'FCFA',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Frais de transfert : 0 FCFA',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                      textAlign: TextAlign.right,
-                    ),
+                    _buildNumberButton('1'),
+                    _buildNumberButton('2'),
+                    _buildNumberButton('3'),
                   ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _transfer,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF667EEA),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildNumberButton('4'),
+                    _buildNumberButton('5'),
+                    _buildNumberButton('6'),
+                  ],
                 ),
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Text(
-                        'Transférer',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildNumberButton('7'),
+                    _buildNumberButton('8'),
+                    _buildNumberButton('9'),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildNumberButton('+', isSpecial: true),
+                    _buildNumberButton('0'),
+                    _buildDeleteButton(),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNumberButton(String number, {bool isSpecial = false}) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Material(
+          color: isSpecial ? Colors.grey.shade300 : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
+            onTap: () => _appendNumber(number),
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(
+                number,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                  color: isSpecial ? Colors.blue : Colors.black,
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
-          ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDeleteButton() {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Material(
+          color: Colors.red.shade50,
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
+            onTap: _deleteLast,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: const Icon(
+                Icons.backspace,
+                color: Colors.red,
+                size: 28,
+              ),
+            ),
+          ),
         ),
       ),
     );
